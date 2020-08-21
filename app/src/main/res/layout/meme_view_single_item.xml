@@ -15,6 +15,7 @@
             android:id="@+id/iv_meme"
             android:layout_width="@dimen/dimen_0dp"
             android:layout_height="wrap_content"
+            android:minHeight="125dp"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toTopOf="@id/tv_meme_title"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -36,7 +37,7 @@
             android:id="@+id/iv_up_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:src="@drawable/arrow_up_bold"
             app:layout_constraintStart_toStartOf="@+id/tv_meme_title"
             app:layout_constraintTop_toBottomOf="@id/tv_meme_title" />

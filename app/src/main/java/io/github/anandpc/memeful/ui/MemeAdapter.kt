@@ -15,7 +15,7 @@ import io.github.anandpc.memeful.data.model.Data
 class MemeAdapter :
     RecyclerView.Adapter<MemeAdapter.MemeViewHolder>() {
 
-    var mMemeList: List<Data> = emptyList()
+    var mMemeList: MutableList<Data> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemeViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -44,7 +44,7 @@ class MemeAdapter :
     }
 
     fun setMemesList(memesList: List<Data>) {
-        mMemeList = memesList
-        notifyDataSetChanged()
+        mMemeList.addAll(memesList)
+        notifyItemRangeInserted(mMemeList.size, memesList.size)
     }
 }

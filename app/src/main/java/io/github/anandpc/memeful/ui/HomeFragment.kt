@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AbsListView
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,7 +20,11 @@ class HomeFragment : Fragment() {
     private val mHomeViewModel: HomeViewModel by viewModels()
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mMemeAdapter: MemeAdapter
-    private lateinit var mProgressBar: ProgressBar
+    private lateinit var mProgressBarMain: ProgressBar
+    private lateinit var mProgressBarEnd: ProgressBar
+    private lateinit var mStaggeredGridLayoutManager: StaggeredGridLayoutManager
+
+    private var isScrolling: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,13 +38,14 @@ class HomeFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         mRecyclerView = root.findViewById(R.id.recycler_view)
-        mProgressBar = root.findViewById(R.id.progress_circular)
+        mProgressBarMain = root.findViewById(R.id.progress_circular_main)
+        mProgressBarEnd = root.findViewById(R.id.progress_circular_end)
         mMemeAdapter = MemeAdapter()
-        mRecyclerView.apply {
-            adapter = mMemeAdapter
-            mRecyclerView.layoutManager =
-                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        }
+        mStaggeredGridLayoutManager =
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        mRecyclerView.adapter = mMemeAdapter
+        mRecyclerView.layoutManager = mStaggeredGridLayoutManager
+
         return root
     }
 
@@ -48,10 +54,35 @@ class HomeFragment : Fragment() {
 
         mHomeViewModel.memes.observe(viewLifecycleOwner) { data ->
             if (data.isNotEmpty()) {
-                mProgressBar.visibility = View.GONE
+                mProgressBarMain.visibility = View.GONE
+                mProgressBarEnd.visibility = View.GONE
             }
             mMemeAdapter.setMemesList(data)
         }
+
+        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScrolling = true
+                }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val visibleItems = mStaggeredGridLayoutManager.childCount
+                val totalItems = mStaggeredGridLayoutManager.itemCount
+                val scrolledOutItems: IntArray? =
+                    mStaggeredGridLayoutManager.findFirstVisibleItemPositions(null)
+
+                if (isScrolling && (visibleItems + scrolledOutItems!![0] == totalItems)) {
+                    isScrolling = false
+                    mProgressBarEnd.visibility = View.VISIBLE
+                    mHomeViewModel.getMemes()
+                }
+
+            }
+        })
     }
 
 }
