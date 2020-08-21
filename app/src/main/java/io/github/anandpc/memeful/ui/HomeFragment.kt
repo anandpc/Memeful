@@ -53,7 +53,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mHomeViewModel.memes.observe(viewLifecycleOwner) { data ->
-            if (data.isNotEmpty()) {
+            if (data?.isNotEmpty()!!) {
                 mProgressBarMain.visibility = View.GONE
                 mProgressBarEnd.visibility = View.GONE
             }
