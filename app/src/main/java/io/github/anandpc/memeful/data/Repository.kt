@@ -25,6 +25,9 @@ class Repository @Inject constructor(
 
     fun fetchMemes(): LiveData<List<Data>?> {
         GlobalScope.launch(Dispatchers.IO) {
+            // get from db
+            mMemesListLD.postValue(memesDao.getAllMemes())
+
             // fetch from remote and insert in database
             val response: ResponseBody = mImgurService.fetchViralMemes(page = mPage)
             val baseResponse: BaseResponse =
@@ -37,7 +40,7 @@ class Repository @Inject constructor(
                 // inserted in table
                 memesDao.insertMemes(baseResponse.data)
                 mPage++
-                // fetch from table
+                // fetch updated data from table
                 mMemesListLD.postValue(memesDao.getAllMemes())
             } else {
                 // handle error scenarios
