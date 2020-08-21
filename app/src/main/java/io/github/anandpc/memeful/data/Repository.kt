@@ -31,9 +31,14 @@ class Repository @Inject constructor(
                 Gson().fromJson(response.string(), BaseResponse::class.java)
             Log.d(TAG, "getMemes: $baseResponse")
             if (baseResponse.success != null && baseResponse.success) {
+                if (mPage == 0) {
+                    memesDao.deleteAllMemes()
+                }
+                // inserted in table
                 memesDao.insertMemes(baseResponse.data)
-                mMemesListLD.postValue(memesDao.getAllMemes())
                 mPage++
+                // fetch from table
+                mMemesListLD.postValue(memesDao.getAllMemes())
             } else {
                 // handle error scenarios
                 Log.e(TAG, "getMemes: Error ${baseResponse.status}")
